@@ -62,23 +62,20 @@ variables:
 semantic-release-dry:
   stage: versioning
   extends:
-    - .semantic-release
+    - .semantic-release  
   variables:
     SEMANTIC_RELEASE_REGEX: (?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?
   script:
+    - semantic-release --dry-run --no-ci | tee result
+    - grep "Published release" result | grep -Po ${SEMANTIC_RELEASE_REGEX} > VERSION
+    - export __last_exit_code=$?
     - |
-      cat << EOF >> script.sh
-      DRY_SEMANTIC_CMD='semantic-release --dry-run --no-ci | tee | grep "Published release" | grep -Po \${SEMANTIC_RELEASE_REGEX}'
-      echo "Executing \$DRY_SEMANTIC_CMD"
-      __SEMANTIC_RELEASE_NEXT_VERSION=\$(eval \$DRY_SEMANTIC_CMD)
-      __last_exit_code=\$?
-      if [ \$__last_exit_code -ne 0 ]; then
-        echo "Exit code = \$__last_exit_code"
+      if [ $__last_exit_code -ne 0 ]; then
+        echo "Exit code = $__last_exit_code"
         exit 0;
       fi
-      echo "Writing next version to file"
-      echo -n \$__SEMANTIC_RELEASE_NEXT_VERSION > VERSION
-      EOF
+    - |
+      echo "Next version: $(cat VERSION)"
     - !reference [.semantic-release, script]
   artifacts:
     paths:
@@ -114,7 +111,7 @@ build docker image:
       echo "Building docker image: ${CI_REGISTRY_IMAGE}:{DOCKER_IMAGE_TAG}"
     - docker push "$CI_REGISTRY_IMAGE:${DOCKER_IMAGE_TAG}"
     - |
-      if [ "$CI_COMMIT_BRANCH" == "main" ] then
+      if [ "$CI_COMMIT_BRANCH" == "main" ]; then
         docker tag "$CI_REGISTRY_IMAGE:${DOCKER_IMAGE_TAG}" "$CI_REGISTRY_IMAGE:latest"
         docker push "$CI_REGISTRY_IMAGE:latest"
       fi
