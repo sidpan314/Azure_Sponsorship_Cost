@@ -1,0 +1,17 @@
+from .resource import Resource
+from .virtual_machine_resource import VirtualMachineResource
+from .virtual_machine_scale_set_resource import VirtualMachineScaleSetResource
+from .disk_resource import DiskResource
+from .public_ip_resource import PublicIpAddressResource
+from .recovery_vault_resource import RecoveryVaultResource
+from .cluster_resource import ClusterResource
+from .load_balancer_resource import LoadBalancerResource
+from .storage_account_resource import StorageAccountResource
+from .sql_database_resource import SqlDatabaseResource
+from .dns_zone_resource import DnsZoneResource
+from .public_dns_zone_resource import PublicDnsZoneResource
+from .private_dns_zone_resource import PrivateDnsZoneResource
+from .container_registry_resource import ContainerRegistryResource
+from .log_analytics_workspace_resource import LogAnalyticsWorkspaceResource
+
+from .resource_list import ResourceList

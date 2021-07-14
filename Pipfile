@@ -1,0 +1,33 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+azure-mgmt-resource = "*"
+azure-identity = "*"
+requests = "*"
+azure-mgmt-consumption = "*"
+"azure.mgmt.compute" = "*"
+"azure.mgmt.network" = "*"
+"azure.mgmt.storage" = "*"
+"azure.mgmt.recoveryservices" = "*"
+"azure.mgmt.recoveryservicesbackup" = "*"
+click = "*"
+"azure.mgmt.monitor" = "*"
+azure-mgmt-sql = "*"
+azure-mgmt-dns = "*"
+azure-mgmt-privatedns = "*"
+azure-mgmt-containerregistry = "*"
+markdown = "*"
+azure-mgmt-subscription = "*"
+premailer = "*"
+azure-mgmt-loganalytics = "*"
+"azure.loganalytics" = "*"
+msrestazure = "*"
+azure-cli-core = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
