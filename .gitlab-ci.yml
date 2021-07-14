@@ -52,8 +52,9 @@ variables:
   script:
     - |
       if [[ ! -f VERSION ]]; then
-        echo "No hay nueva version"
-        exit 1;
+        echo "No new version. Cancelling this job..."
+        # Cancel this job instead of exit with error
+        curl --request POST --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/jobs/${CI_JOB_ID}/cancel"
       fi
 
 semantic-release-dry:
@@ -64,15 +65,16 @@ semantic-release-dry:
     SEMANTIC_RELEASE_REGEX: (?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?
   script:
     - semantic-release --dry-run --no-ci | tee result
-    - grep "Published release" result | grep -Po ${SEMANTIC_RELEASE_REGEX} > VERSION
-    - export __last_exit_code=$?
+    - export __last_exit_code=0
+    - grep "Published release" result | grep -Po ${SEMANTIC_RELEASE_REGEX} > VERSION || export __last_exit_code=$?
     - |
       if [ $__last_exit_code -ne 0 ]; then
         echo "Exit code = $__last_exit_code"
-        exit 0;
+        # Still created but empty
+        rm VERSION
+      else
+        echo "Next version: $(cat VERSION)"
       fi
-    - |
-      echo "Next version: $(cat VERSION)"
     - !reference [.semantic-release, script]
   artifacts:
     paths:
