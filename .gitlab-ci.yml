@@ -135,3 +135,4 @@ scheduled_report:
     - canalyzer_smtp html_report_summary.html report.md -a report.pdf
   rules:
     - <<: *scheduled-pipeline
+    - when: on_success
