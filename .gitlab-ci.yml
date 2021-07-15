@@ -3,8 +3,8 @@ workflow:
     - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_COMMIT_BRANCH'
 
 .sceduled-pipeline: &scheduled-pipeline
-  if: '$CI_PIPELINE_SOURCE == "schedule"'
-  when: on_success
+  if: '$CI_PIPELINE_SOURCE != "schedule"'
+  when: never
 .non-sceduled-pipeline: &non-scheduled-pipeline
   if: '$CI_PIPELINE_SOURCE == "schedule"'
   when: never
@@ -120,6 +120,8 @@ build docker image:
       fi
   rules:
     - <<: *non-scheduled-pipeline
+    - if: '$CI_COMMIT_BRANCH != "main"'
+      when: manual
     - when: on_success
       
 scheduled_report:

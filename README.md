@@ -40,6 +40,17 @@ This repository contains 3 tools with specific use case:
 
 > The details of each tool are located in the respectic folder. Follow the links.
 
+## Configuration
+
+These configuration options apply to the whole toolset of this repository. For specific tool configurations, please refer to their documentation.
+
+- `CANALYZER_LOG_LEVEL`: Sets the log level to use. If an invalid value is used, it will change it to the default one. This option is case insensitive and allows the following values:
+  - DEBUG (default)
+  - INFO
+  - WARN or WARNING
+  - ERROR
+  - FATAL
+
 ## How to use
 
 Create a new virtual environment. In this case we use `pipenv` and a local `venv` directory
