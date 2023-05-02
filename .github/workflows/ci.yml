@@ -40,7 +40,8 @@ jobs:
 
       - name: Install Semantic Release
         run: npm install -g semantic-release @semantic-release/github
-
+             npm install --save-dev @semantic-release/exec
+             
       - name: Run Semantic Release (Dry Run)
         run: |
           if [[ ! -f VERSION ]]; then
@@ -90,6 +91,7 @@ jobs:
 
       - name: Install Semantic Release
         run: npm install -g semantic-release @semantic-release/github
+             npm install --save-dev @semantic-release/exec
 
       - name: Run Semantic Release
         run: semantic-release
