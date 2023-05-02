@@ -11,6 +11,8 @@ on:
     tags:
       - '*.*.*'
   workflow_dispatch:
+env:
+    DOCKER_VERSION: 19.03.15
 
 defaults:
   run:
@@ -20,8 +22,6 @@ jobs:
   semantic-release-dry:
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    env:
-    DOCKER_VERSION: 19.03.15
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
