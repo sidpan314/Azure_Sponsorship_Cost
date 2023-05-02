@@ -10,6 +10,7 @@ on:
       - '**/*.md'
     tags:
       - '*.*.*'
+  workflow_dispatch:
 
 defaults:
   run:
