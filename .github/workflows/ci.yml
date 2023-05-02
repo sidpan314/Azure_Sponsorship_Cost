@@ -39,7 +39,7 @@ jobs:
           node-version: 'lts/*'
 
       - name: Install Semantic Release
-        run: npm install -g semantic-release @semantic-release/exec
+        run: npm install -g semantic-release @semantic-release/github
 
       - name: Run Semantic Release (Dry Run)
         run: |
@@ -89,7 +89,7 @@ jobs:
           node-version: 'lts/*'
 
       - name: Install Semantic Release
-        run: npm install -g semantic-release @semantic-release/exec
+        run: npm install -g semantic-release @semantic-release/github
 
       - name: Run Semantic Release
         run: semantic-release
