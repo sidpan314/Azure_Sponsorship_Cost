@@ -1,0 +1,191 @@
+name: My Workflow
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**/*.md'
+    tags:
+      - '*.*.*'
+
+defaults:
+  run:
+    shell: bash
+  env:
+    DOCKER_VERSION: 19.03.15
+
+jobs:
+  semantic-release-dry:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Cache Node Modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ github.sha }}
+          restore-keys: ${{ runner.os }}-npm-
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 'lts/*'
+
+      - name: Install Semantic Release
+        run: npm install -g semantic-release @semantic-release/exec
+
+      - name: Run Semantic Release (Dry Run)
+        run: |
+          if [[ ! -f VERSION ]]; then
+            echo "No new version. Cancelling this job..."
+            exit 0
+          fi
+          semantic-release --dry-run --no-ci | tee result
+          export __last_exit_code=0
+          grep "Published release" result | grep -Po '(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?' > VERSION || export __last_exit_code=$?
+          if [ $__last_exit_code -ne 0 ]; then
+            echo "Exit code = $__last_exit_code"
+            rm VERSION
+          else
+            echo "Next version: $(cat VERSION)"
+          fi
+
+      - name: Set Version as Env Variable
+        id: get_version
+        run: echo "::set-output name=version::$(cat VERSION)"
+
+      - name: Save Version Artifact
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: VERSION
+          path: VERSION
+
+  semantic-release:
+    needs: semantic-release-dry
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name != 'schedule'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Cache Node Modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ github.sha }}
+          restore-keys: ${{ runner.os }}-npm-
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 'lts/*'
+
+      - name: Install Semantic Release
+        run: npm install -g semantic-release @semantic-release/exec
+
+      - name: Run Semantic Release
+        run: semantic-release
+
+      - name: Save Version Artifact
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: VERSION
+          path: VERSION
+
+  build-docker-image:
+    runs-on: ubuntu-latest
+    needs: semantic-release-dry
+    if: github.ref == 'refs/heads/main' || github.event_name == 'push'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Cache Node Modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ github.sha }}
+          restore-keys: ${{ runner.os }}-npm-
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 'lts/*'
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ${{ env.CI_REGISTRY_IMAGE }}:${{ needs.semantic-release-dry.outputs.version }}
+        env:
+          DOCKER_USERNAME: ${{ secrets.CI_REGISTRY_USER }}
+          DOCKER_PASSWORD: ${{ secrets.CI_REGISTRY_PASSWORD }}
+          DOCKER_CLI_EXPERIMENTAL: enabled
+
+      - name: Tag Latest Docker Image
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker tag ${{ env.CI_REGISTRY_IMAGE }}:${{ needs.semantic-release-dry.outputs.version }} ${{ env.CI_REGISTRY_IMAGE }}:latest
+          docker push ${{ env.CI_REGISTRY_IMAGE }}:latest
+
+  scheduled-report:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Cache Node Modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ github.sha }}
+          restore-keys: ${{ runner.os }}-npm-
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 'lts/*'
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+          platforms: linux/amd64,linux/arm64
+          push: false
+          target: report-builder
+        env:
+          DOCKER_USERNAME: ${{ secrets.CI_REGISTRY_USER }}
+          DOCKER_PASSWORD: ${{ secrets.CI_REGISTRY_PASSWORD }}
+          DOCKER_CLI_EXPERIMENTAL: enabled
+
+      - name: Generate Report
+        run: |
+          docker run --rm -v "$(pwd):/canalyzer" ${{ env.CI_REGISTRY_IMAGE }}:latest cat $CANALYZER_APPSETTINGS_PATH > appsettings.json
+          docker run --rm -v "$(pwd):/canalyzer" ${{ env.CI_REGISTRY_IMAGE }}:latest canalyzer -o report -f markdown
+          docker run --rm -v "$(pwd):/canalyzer" ${{ env.CI_REGISTRY_IMAGE }}:latest markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report
+          docker run --rm -v "$(pwd):/canalyzer" ${{ env.CI_REGISTRY_IMAGE }}:latest wkhtmltopdf html_report.html report.pdf
+          docker run --rm -v "$(pwd):/canalyzer" ${{ env.CI_REGISTRY_IMAGE }}:latest canalyzer_smtp html_report_summary.html report.md -a report.pdf
+
+      - name: Publish Report
+        uses: actions/upload-artifact@v2
+        with:
+          name: report
+          path: report.pdf
+
+      - name: Cleanup
+        run: |
+          docker system prune -f
+          docker volume prune -f
+          docker network prune -f
