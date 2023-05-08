@@ -71,11 +71,12 @@ jobs:
       - name: Run Steps in Container
         run: |
           docker run --rm \
-            -v ${{ github.workspace }}:/app \
+            -v /home/runner/work/Azure_Sponsorship_Cost/Azure_Sponsorship_Cost:/app \
             -w /app \
+            -e CANALYZER_APPSETTINGS_PATH="/appsettings.json" \
             canalyzer:latest \
             /bin/bash -c "\
-            markdown_to_html report.md  --css styles.css --with-summary --premailer -o html_report \
+            cat \$CANALYZER_APPSETTINGS_PATH > appsettings.json && canalyzer -o report -f markdown \
             "
 
   generate-pdf:
