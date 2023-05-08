@@ -89,8 +89,11 @@ class Configuration:
                         self.smtp.load_from_file(file_content[k])
                     elif to_snake_case(k) in dir(self):
                         self.__setattr__(to_snake_case(k), file_content[k])
+        # debug code to print file content
+            print("File content:", file_content)
         else:
             self._logger.debug("Settings file 'appsettings.json' not found")
+
 
     def __repr__(self) -> str:
         return f"""<Configuration 
