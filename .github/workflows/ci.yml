@@ -44,10 +44,6 @@ jobs:
              
       - name: Run Semantic Release (Dry Run)
         run: |
-     #     if [[ ! -f VERSION ]]; then
-     #       echo "No new version. Cancelling this job..."
-     #       exit 0
-     #     fi
           semantic-release --dry-run --no-ci | tee result
           export __last_exit_code=0
           grep "Published release" result | grep -Po '(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?' > VERSION || export __last_exit_code=$?
