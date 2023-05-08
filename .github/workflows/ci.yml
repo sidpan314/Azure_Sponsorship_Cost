@@ -45,7 +45,7 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}:/app \
             -w /app \
-            -e CANALYZER_APPSETTINGS_PATH="${{ secrets.CANALYZER_APPSETTINGS_PATH }}" \
+            -e CANALYZER_APPSETTINGS_PATH=""/app/appsettings.json"" \
             canalyzer:latest \
             /bin/bash -c "\
             cat \$CANALYZER_APPSETTINGS_PATH > appsettings.json \
