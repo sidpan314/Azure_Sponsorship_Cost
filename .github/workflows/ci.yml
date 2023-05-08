@@ -48,6 +48,7 @@ jobs:
             -e CANALYZER_APPSETTINGS_PATH=""/app/appsettings.json"" \
             canalyzer:latest \
             /bin/bash -c "\
+            ls -al /app && \
             cat \$CANALYZER_APPSETTINGS_PATH > appsettings.json \
             && canalyzer -o report -f markdown \
             "
