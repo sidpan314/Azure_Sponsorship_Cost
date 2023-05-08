@@ -45,14 +45,11 @@ jobs:
           docker run --rm \
             -v /home/runner/work/Azure_Sponsorship_Cost/Azure_Sponsorship_Cost:/app \
             -w /app \
-            -e APPID="d6039bbc-4d45-48be-a8fc-60470df9a2c2" \
-            -e DISPLAYNAME="ConsumptionAPI" \
-            -e PASSWORD="f2O8Q~c1uXFrAR4zVezaUGSNoy3Pj75lregNec3v" \
-            -e TENANT="f8a0dab4-64f6-4c81-9db4-47a9f639039a" \
+            -e CANALYZER_APPSETTINGS_PATH="/app/appsettings.json" \
             canalyzer:latest \
             /bin/bash -c "\
             ls -al /app && \
-            cat \$CANALYZER_APPSETTINGS_PATH > appsettings.json \
+            echo '${{ secrets.APPSETTINGS_JSON }}' > \$CANALYZER_APPSETTINGS_PATH \
             && canalyzer -o report -f markdown \
             "
 
