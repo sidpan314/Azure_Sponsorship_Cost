@@ -124,6 +124,7 @@ jobs:
           node-version: 'lts/*'
 
       - name: Build Docker Image
+        if: steps.semantic-release-dry.outputs.version_changed == 'true'
         uses: docker/build-push-action@v2
         with:
           context: .
@@ -137,7 +138,7 @@ jobs:
           CI_REGISTRY_IMAGE: docker.io/sidpan314/azurecostanalyzer
 
       - name: Tag Latest Docker Image
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && steps.semantic-release-dry.outputs.version_changed == 'true'
         run: |
           docker tag ${{ env.CI_REGISTRY_IMAGE }}:${{ needs.semantic-release-dry.outputs.version }} ${{ env.CI_REGISTRY_IMAGE }}:latest
           docker push ${{ env.CI_REGISTRY_IMAGE }}:latest
