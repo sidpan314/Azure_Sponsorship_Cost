@@ -43,7 +43,7 @@ jobs:
       - name: Run Steps in Container
         run: |
           echo "Secret content:"
-          echo '${{ secrets.APPSETTINGS_JSON }}'
+          echo '${{ secrets.APPSETTINGS_JSON }}' | base64 --decode > appsettings.json
           docker run --rm \
             -v /home/runner/work/Azure_Sponsorship_Cost/Azure_Sponsorship_Cost:/app \
             -w /app \
