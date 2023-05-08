@@ -92,7 +92,7 @@ jobs:
       - name: Run Semantic Release
         run: semantic-release
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Save Version Artifact
         if: always()
