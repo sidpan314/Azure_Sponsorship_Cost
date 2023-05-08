@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  generate-and-send-report:
+  build-docker-image:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -15,7 +15,14 @@ jobs:
       - name: Build Docker Image
         run: docker build -t canalyzer:latest .
 
-      - name: Run Steps in Container
+  generate-report:
+    needs: build-docker-image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Run Canalyzer in Container
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/app \
@@ -25,6 +32,49 @@ jobs:
             /bin/bash -c "\
             cat \$CANALYZER_APPSETTINGS_PATH > appsettings.json \
             && canalyzer -o report -f markdown \
-            && markdown_to_html report.md  --css styles.css --with-summary --premailer -o html_report \
-            && wkhtmltopdf html_report.html report.pdf \
-            && canalyzer_smtp html_report_summary.html report.md -a report.pdf \
+            "
+
+  convert-to-html:
+    needs: generate-report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Convert Markdown to HTML
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            canalyzer:latest \
+            markdown_to_html report.md  --css styles.css --with-summary --premailer -o html_report
+
+  generate-pdf:
+    needs: convert-to-html
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Convert HTML to PDF
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            canalyzer:latest \
+            wkhtmltopdf html_report.html report.pdf
+
+  send-email:
+    needs: generate-pdf
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Send Report via Email
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            canalyzer:latest \
+            canalyzer_smtp html_report_summary.html report.md -a report.pdf
