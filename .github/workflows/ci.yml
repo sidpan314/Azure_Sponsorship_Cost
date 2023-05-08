@@ -5,9 +5,6 @@ on:
     - cron: '0 0 * * *'
   workflow_dispatch:
 
-env:
-  IMAGE_NAME: canalyzer
-
 jobs:
   build-docker-image:
     runs-on: ubuntu-latest
@@ -16,16 +13,16 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build Docker Image
-        run: docker build -t ${{ env.IMAGE_NAME }}:latest .
+        run: docker build -t canalyzer:latest .
 
       - name: Cache Docker Image
         uses: actions/cache@v2
         with:
-          path: /tmp/docker-images
-          key: ${{ runner.os }}-docker-image-${{ env.IMAGE_NAME }}
+          path: docker-image.tar
+          key: ${{ runner.os }}-docker-image-${{ hashFiles('**/Dockerfile') }}
+      - name: Save Docker Image
         run: |
-          mkdir -p /tmp/docker-images
-          docker save ${{ env.IMAGE_NAME }}:latest -o /tmp/docker-images/${{ env.IMAGE_NAME }}.tar
+          docker save canalyzer:latest -o docker-image.tar
 
   generate-report:
     needs: build-docker-image
@@ -34,24 +31,108 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Load Cached Docker Image
+      - name: Load Docker Image from Cache
         uses: actions/cache@v2
         with:
-          path: /tmp/docker-images
-          key: ${{ runner.os }}-docker-image-${{ env.IMAGE_NAME }}
+          path: docker-image.tar
+          key: ${{ runner.os }}-docker-image-${{ hashFiles('**/Dockerfile') }}
+      - name: Load Docker Image
         run: |
-          docker load -i /tmp/docker-images/${{ env.IMAGE_NAME }}.tar
+          docker load -i docker-image.tar
 
-      - name: Run Canalyzer in Container
+      - name: Run Steps in Container
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/app \
             -w /app \
             -e CANALYZER_APPSETTINGS_PATH="${{ secrets.CANALYZER_APPSETTINGS_PATH }}" \
-            ${{ env.IMAGE_NAME }}:latest \
+            canalyzer:latest \
             /bin/bash -c "\
             cat \$CANALYZER_APPSETTINGS_PATH > appsettings.json \
             && canalyzer -o report -f markdown \
             "
 
-  # ... The rest of the jobs with the same changes for caching and loading the Docker image
+  convert-to-html:
+    needs: generate-report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Load Docker Image from Cache
+        uses: actions/cache@v2
+        with:
+          path: docker-image.tar
+          key: ${{ runner.os }}-docker-image-${{ hashFiles('**/Dockerfile') }}
+      - name: Load Docker Image
+        run: |
+          docker load -i docker-image.tar
+
+      - name: Run Steps in Container
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            canalyzer:latest \
+            /bin/bash -c "\
+            markdown_to_html report.md  --css styles.css --with-summary --premailer -o html_report \
+            "
+
+  generate-pdf:
+    needs: convert-to-html
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Load Docker Image from Cache
+        uses: actions/cache@v2
+        with:
+          path: docker-image.tar
+          key: ${{ runner.os }}-docker-image-${{ hashFiles('**/Dockerfile') }}
+      - name: Load Docker Image
+        run: |
+          docker load -i docker-image.tar
+
+      - name: Run Steps in Container
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            canalyzer:latest \
+            /bin/bash -c "\
+            wkhtmltopdf html_report.html report.pdf \
+            "
+
+  send-email:
+    needs: generate-pdf
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Load Docker Image from Cache
+        uses: actions/cache@v2
+        with:
+          path: docker-image.tar
+          key: ${{ runner.os }}-docker-image-${{ hashFiles('**/Dockerfile') }}
+      - name: Load Docker Image
+        run: |
+          docker load -i docker-image.tar
+
+      - name: Run Steps in Container
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            -e SMTP_SERVER="${{ secrets.SMTP_SERVER }}" \
+            -e SMTP_PORT="${{ secrets.SMTP_PORT }}" \
+            -e SMTP_USERNAME="${{ secrets.SMTP_USERNAME }}" \
+            -e SMTP_PASSWORD="${{ secrets.SMTP_PASSWORD }}" \
+            -e EMAIL_FROM="${{ secrets.EMAIL_FROM }}" \
+            -e EMAIL_TO="${{ secrets.EMAIL_TO }}" \
+            canalyzer:latest \
+            /bin/bash -c "\
+            canalyzer_smtp html_report_summary.html report.md -a report.pdf \
+            "
+
