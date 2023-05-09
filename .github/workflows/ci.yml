@@ -51,7 +51,6 @@ jobs:
             canalyzer:latest \
             /bin/bash -c "\
             ls -al /app && \
-            echo '${{ secrets.APPSETTINGS_JSON }}' > \$CANALYZER_APPSETTINGS_PATH \
             && echo 'Content of appsettings.json:' \
             && cat \$CANALYZER_APPSETTINGS_PATH \
             && canalyzer -o report -f markdown \
