@@ -1,10 +1,9 @@
 FROM python:3.8-slim AS build
 WORKDIR /src
 COPY requirements.txt .
-RUN apt-get update && \
-    apt-get install -y jq && \
-    apt-get install -y --no-install-recommends build-essential gcc && \
-    pip install --user -r requirements.txt --no-warn-script-location
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends build-essential gcc\
+  && pip install --user -r requirements.txt --no-warn-script-location
 
 COPY setup.py .
 COPY canalyzer/ canalyzer/
@@ -26,7 +25,8 @@ RUN apt-get update \
   && wget -O wkhtmltopdf.deb https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}.buster_amd64.deb \
   && dpkg -i wkhtmltopdf.deb \
   && rm -f wkhtmltopdf.deb \
-  && apt-get purge -y wget
+  && apt-get purge -y wget \
+  && pip install markdown
 WORKDIR /app
 COPY styles.css /app/styles.css
 
