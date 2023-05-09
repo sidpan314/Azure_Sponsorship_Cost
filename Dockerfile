@@ -1,4 +1,5 @@
 FROM python:3.8-slim AS build
+
 WORKDIR /src
 COPY requirements.txt .
 RUN apt-get update \
@@ -17,7 +18,10 @@ RUN apt-get update \
   build-essential \
   gcc \
   jq \
-  fontconfig libfreetype6 libjpeg62-turbo libpng16-16 \
+  fontconfig \
+  libfreetype6 \
+  libjpeg62-turbo \
+  libpng16-16 \
   libx11-6 \
   libxcb1 \
   libxext6 \
