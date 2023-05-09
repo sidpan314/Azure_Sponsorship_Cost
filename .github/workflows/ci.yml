@@ -53,8 +53,8 @@ jobs:
             canalyzer:latest \
             /bin/bash -c "\
             echo '{\"clientId\": \"'${CLIENT_ID}'\", \"clientSecret\": \"'${CLIENT_SECRET}'\", \"subscriptionId\": \"'${SUBSCRIPTION_ID}'\", \"tenantId\": \"'${TENANT_ID}'\"}' > temp.json && \
-            apt-get update && apt-get install -y jq && \
-            jq -s '.[0] * .[1]' appsettings.json temp.json > temp2.json && \
+            sed -e '1s/^/[\n/' -e '$s/}$/\n]/' appsettings.json | tr '\n' ' ' > temp2.json && \
+            sed -i '/\"Authentication\": {/r temp.json' temp2.json && \
             mv temp2.json appsettings.json && \
             canalyzer -o report -f markdown && \
             markdown_to_html report.md  --css styles.css --with-summary --premailer -o html_report && \
