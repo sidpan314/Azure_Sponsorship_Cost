@@ -12,15 +12,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Run Report
-        env:
-          CANALYZER_APPSETTINGS_PATH: "/app/appsettings.json"
-          SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
-          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
-          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+      - name: Build Docker Image
+        run: docker build -t canalyzer:latest .
+
+      - name: Run Steps in Container
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/app \
@@ -35,12 +30,12 @@ jobs:
             -e CANALYYZER_SQL_MANAGEMENT_ENDPOINT_URL="https://management.core.windows.net:8443/" \
             -e CANALYYZER_GALLERY_ENDPOINT_URL="https://gallery.azure.com/" \
             -e CANALYYZER_MANAGEMENT_ENDPOINT_URL="https://management.core.windows.net/" \
-            -e SMTP_SERVER="${SMTP_SERVER}" \
-            -e SMTP_PORT="${SMTP_PORT}" \
-            -e SMTP_USERNAME="${SMTP_USERNAME}" \
-            -e SMTP_PASSWORD="${SMTP_PASSWORD}" \
-            -e EMAIL_FROM="${EMAIL_FROM}" \
-            -e EMAIL_TO="${EMAIL_TO}" \
+            -e SMTP_SERVER="${{ secrets.SMTP_SERVER }}" \
+            -e SMTP_PORT="${{ secrets.SMTP_PORT }}" \
+            -e SMTP_USERNAME="${{ secrets.SMTP_USERNAME }}" \
+            -e SMTP_PASSWORD="${{ secrets.SMTP_PASSWORD }}" \
+            -e EMAIL_FROM="${{ secrets.EMAIL_FROM }}" \
+            -e EMAIL_TO="${{ secrets.EMAIL_TO }}" \
             canalyzer:latest \
             /bin/bash -c "\
               echo 'CANALYZER_APPSETTINGS_PATH: $CANALYZER_APPSETTINGS_PATH' && \
@@ -50,3 +45,12 @@ jobs:
               wkhtmltopdf html_report.html report.pdf && \
               canalyzer_smtp html_report_summary.html report.md -a report.pdf \
             "
+          shell: /usr/bin/bash -e {0}
+          env:
+            CANALYZER_APPSETTINGS_PATH: /app/appsettings.json
+            SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+            SMTP_PORT: ${{ secrets.SMTP_PORT }}
+            SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+            SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+            EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+            EMAIL_TO: ${{ secrets.EMAIL_TO }}
