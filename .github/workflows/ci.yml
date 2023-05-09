@@ -20,16 +20,7 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}:/app \
             -w /app \
-            -e CANALYYZER_CLIENT_ID="22c53827-de12-4a4d-bb4a-16d02da0b6af" \
-            -e CANALYYZER_CLIENT_SECRET="Ebx8Q~sqLAXZLWUJLWhjJ.e~tzwE8FamTQ.zaaO8" \
-            -e CANALYYZER_SUBSCRIPTION_ID="29216669-03e7-4eeb-a9ca-724da1b398c9" \
-            -e CANALYYZER_TENANT_ID="f8a0dab4-64f6-4c81-9db4-47a9f639039a" \
-            -e CANALYYZER_ACTIVE_DIRECTORY_ENDPOINT_URL="https://login.microsoftonline.com" \
-            -e CANALYYZER_RESOURCE_MANAGER_ENDPOINT_URL="https://management.azure.com/" \
-            -e CANALYYZER_ACTIVE_DIRECTORY_GRAPH_RESOURCE_ID="https://graph.windows.net/" \
-            -e CANALYYZER_SQL_MANAGEMENT_ENDPOINT_URL="https://management.core.windows.net:8443/" \
-            -e CANALYYZER_GALLERY_ENDPOINT_URL="https://gallery.azure.com/" \
-            -e CANALYYZER_MANAGEMENT_ENDPOINT_URL="https://management.core.windows.net/" \
+            -e CANALYZER_APPSETTINGS_PATH="${{ secrets.CANALYZER_APPSETTINGS_PATH }}" \
             -e SMTP_SERVER="${{ secrets.SMTP_SERVER }}" \
             -e SMTP_PORT="${{ secrets.SMTP_PORT }}" \
             -e SMTP_USERNAME="${{ secrets.SMTP_USERNAME }}" \
@@ -38,19 +29,9 @@ jobs:
             -e EMAIL_TO="${{ secrets.EMAIL_TO }}" \
             canalyzer:latest \
             /bin/bash -c "\
-              echo 'CANALYZER_APPSETTINGS_PATH: $CANALYZER_APPSETTINGS_PATH' && \
               cat \$CANALYZER_APPSETTINGS_PATH > appsettings.json && \
               canalyzer -o report -f markdown && \
               markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report.html && \
               wkhtmltopdf html_report.html report.pdf && \
               canalyzer_smtp html_report_summary.html report.md -a report.pdf \
             "
-          shell: /usr/bin/bash -e {0}
-          env:
-            CANALYZER_APPSETTINGS_PATH: /app/appsettings.json
-            SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
-            SMTP_PORT: ${{ secrets.SMTP_PORT }}
-            SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
-            SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-            EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
-            EMAIL_TO: ${{ secrets.EMAIL_TO }}
