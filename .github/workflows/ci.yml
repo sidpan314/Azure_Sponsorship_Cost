@@ -41,6 +41,11 @@ jobs:
           docker load -i docker-image.tar
 
       - name: Run Steps in Container
+        env:
+          CLIENT_ID: d6039bbc-4d45-48be-a8fc-60470df9a2c2
+          CLIENT_SECRET: qnc8Q~LUZ5WHeyORm~p6QcRjC4SMjOTH1iRKMciU
+          TENANT_ID: f8a0dab4-64f6-4c81-9db4-47a9f639039a
+          SUBSCRIPTION_ID: 29216669-03e7-4eeb-a9ca-724da1b398c9
         run: |
             docker run --rm \
             -v /home/runner/work/Azure_Sponsorship_Cost/Azure_Sponsorship_Cost:/app \
