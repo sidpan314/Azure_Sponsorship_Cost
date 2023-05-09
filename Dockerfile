@@ -14,6 +14,9 @@ ENV WKHTMLTOPDF_VERSION=0.12.6-1
 COPY --from=build /root/.local /root/.local
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
+  build-essential \
+  gcc \
+  jq \
   fontconfig libfreetype6 libjpeg62-turbo libpng16-16 \
   libx11-6 \
   libxcb1 \
@@ -27,6 +30,7 @@ RUN apt-get update \
   && rm -f wkhtmltopdf.deb \
   && apt-get purge -y wget
 WORKDIR /app
+COPY appsettings.json /app/appsettings.json
 COPY styles.css /app/styles.css
 
 # Make sure scripts in .local are usable:
