@@ -12,10 +12,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Build Docker Image
-        run: docker build -t canalyzer:latest .
-
-      - name: Run Steps in Container
+      - name: Run Report
+        env:
+          CANALYZER_APPSETTINGS_PATH: "/app/appsettings.json"
+          SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/app \
@@ -30,14 +35,16 @@ jobs:
             -e CANALYYZER_SQL_MANAGEMENT_ENDPOINT_URL="https://management.core.windows.net:8443/" \
             -e CANALYYZER_GALLERY_ENDPOINT_URL="https://gallery.azure.com/" \
             -e CANALYYZER_MANAGEMENT_ENDPOINT_URL="https://management.core.windows.net/" \
-            -e SMTP_SERVER="${{ secrets.SMTP_SERVER }}" \
-            -e SMTP_PORT="${{ secrets.SMTP_PORT }}" \
-            -e SMTP_USERNAME="${{ secrets.SMTP_USERNAME }}" \
-            -e SMTP_PASSWORD="${{ secrets.SMTP_PASSWORD }}" \
-            -e EMAIL_FROM="${{ secrets.EMAIL_FROM }}" \
-            -e EMAIL_TO="${{ secrets.EMAIL_TO }}" \
+            -e SMTP_SERVER="${SMTP_SERVER}" \
+            -e SMTP_PORT="${SMTP_PORT}" \
+            -e SMTP_USERNAME="${SMTP_USERNAME}" \
+            -e SMTP_PASSWORD="${SMTP_PASSWORD}" \
+            -e EMAIL_FROM="${EMAIL_FROM}" \
+            -e EMAIL_TO="${EMAIL_TO}" \
             canalyzer:latest \
             /bin/bash -c "\
+              echo 'CANALYZER_APPSETTINGS_PATH: $CANALYZER_APPSETTINGS_PATH' && \
+              cat \$CANALYZER_APPSETTINGS_PATH > appsettings.json && \
               canalyzer -o report -f markdown && \
               markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report.html && \
               wkhtmltopdf html_report.html report.pdf && \
