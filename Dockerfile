@@ -1,11 +1,9 @@
 FROM python:3.8-slim AS build
-
 WORKDIR /src
 COPY requirements.txt .
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends build-essential gcc && \
-    pip install --user -r requirements.txt --no-warn-script-location
-
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends build-essential gcc\
+  && pip install --user -r requirements.txt --no-warn-script-location
 
 COPY setup.py .
 COPY canalyzer/ canalyzer/
@@ -16,10 +14,7 @@ ENV WKHTMLTOPDF_VERSION=0.12.6-1
 COPY --from=build /root/.local /root/.local
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-  fontconfig \
-  libfreetype6 \
-  libjpeg62-turbo \
-  libpng16-16 \
+  fontconfig libfreetype6 libjpeg62-turbo libpng16-16 \
   libx11-6 \
   libxcb1 \
   libxext6 \
@@ -32,7 +27,6 @@ RUN apt-get update \
   && rm -f wkhtmltopdf.deb \
   && apt-get purge -y wget
 WORKDIR /app
-COPY appsettings.json /app/appsettings.json
 COPY styles.css /app/styles.css
 
 # Make sure scripts in .local are usable:
