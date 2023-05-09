@@ -43,10 +43,9 @@ jobs:
       - name: Run Steps in Container
         run: |
           docker run --rm \
-            -v /home/runner/work/Azure_Sponsorship_Cost/Azure_Sponsorship_Cost:/app \
+            -v ${{ github.workspace }}:/app \
             -w /app \
-            -e CANALYZER_APPSETTINGS_PATH="/app/appsettings.json" \
-            canalyzer:latest \
+             canalyzer:latest \
             /bin/bash -c "\
             ls -al /app && \
             && echo 'Content of appsettings.json:' \
