@@ -15,9 +15,6 @@ ENV WKHTMLTOPDF_VERSION=0.12.6-1
 COPY --from=build /root/.local /root/.local
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-  build-essential \
-  gcc \
-  jq \
   fontconfig \
   libfreetype6 \
   libjpeg62-turbo \
