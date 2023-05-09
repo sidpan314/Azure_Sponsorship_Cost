@@ -38,7 +38,6 @@ jobs:
             -e EMAIL_TO="${{ secrets.EMAIL_TO }}" \
             canalyzer:latest \
             /bin/bash -c "\
-              echo \"\$CANALYZER_APPSETTINGS_CONTENT\" > appsettings.json && \
               canalyzer -o report -f markdown && \
               markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report.html && \
               wkhtmltopdf html_report.html report.pdf && \
