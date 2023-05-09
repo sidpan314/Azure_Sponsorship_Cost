@@ -42,8 +42,7 @@ jobs:
 
       - name: Run Steps in Container
         run: |
-          echo "Secret content:"
-            docker run --rm \
+          docker run --rm \
             -v /home/runner/work/Azure_Sponsorship_Cost/Azure_Sponsorship_Cost:/app \
             -w /app \
             -e CANALYZER_APPSETTINGS_PATH="/app/appsettings.json" \
