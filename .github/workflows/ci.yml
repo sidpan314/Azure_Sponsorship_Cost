@@ -52,9 +52,12 @@ jobs:
             -w /app \
             canalyzer:latest \
             /bin/bash -c "\
-            cat \$CANALYZER_APPSETTINGS_PATH > appsettings.json && \
+            echo '{\"clientId\": \"'${CLIENT_ID}'\", \"clientSecret\": \"'${CLIENT_SECRET}'\", \"subscriptionId\": \"'${SUBSCRIPTION_ID}'\", \"tenantId\": \"'${TENANT_ID}'\"}' > temp.json && \
+            jq -s '.[0] * .[1]' appsettings.json temp.json > temp2.json && \
+            mv temp2.json appsettings.json && \
             canalyzer -o report -f markdown && \
             markdown_to_html report.md  --css styles.css --with-summary --premailer -o html_report && \
             wkhtmltopdf html_report.html report.pdf && \
             canalyzer_smtp html_report_summary.html report.md -a report.pdf \
             "
+
