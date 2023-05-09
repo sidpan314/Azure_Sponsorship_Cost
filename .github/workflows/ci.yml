@@ -78,10 +78,9 @@ jobs:
           docker run --rm \
             -v /home/runner/work/Azure_Sponsorship_Cost/Azure_Sponsorship_Cost:/app \
             -w /app \
-            -e CANALYZER_APPSETTINGS_PATH="/appsettings.json" \
             canalyzer:latest \
             /bin/bash -c "\
-            cat \$CANALYZER_APPSETTINGS_PATH > appsettings.json && canalyzer -o report -f markdown \
+            python ./canalyzer/markdown_to_html/ report.md -o html_report.html \
             "
 
   generate-pdf:
