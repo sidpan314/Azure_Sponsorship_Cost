@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-docker-image:
+  generate_and_send_report:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -15,117 +15,12 @@ jobs:
       - name: Build Docker Image
         run: docker build -t canalyzer:latest .
 
-      - name: Cache Docker Image
-        uses: actions/cache@v2
-        with:
-          path: docker-image.tar
-          key: ${{ runner.os }}-docker-image-${{ hashFiles('**/Dockerfile') }}
-      - name: Save Docker Image
-        run: |
-          docker save canalyzer:latest -o docker-image.tar
-
-  generate-report:
-    needs: build-docker-image
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-
-      - name: Load Docker Image from Cache
-        uses: actions/cache@v2
-        with:
-          path: docker-image.tar
-          key: ${{ runner.os }}-docker-image-${{ hashFiles('**/Dockerfile') }}
-      - name: Load Docker Image
-        run: |
-          docker load -i docker-image.tar
-
       - name: Run Steps in Container
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/app \
             -w /app \
-             canalyzer:latest \
-            /bin/bash -c "\
-            ls -al /app && \
-            && echo 'Content of appsettings.json:' \
-            && cat \$CANALYZER_APPSETTINGS_PATH \
-            && canalyzer -o report -f markdown \
-            "
-
-  convert-to-html:
-    needs: generate-report
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-
-      - name: Load Docker Image from Cache
-        uses: actions/cache@v2
-        with:
-          path: docker-image.tar
-          key: ${{ runner.os }}-docker-image-${{ hashFiles('**/Dockerfile') }}
-      - name: Load Docker Image
-        run: |
-          docker load -i docker-image.tar
-
-      - name: Run Steps in Container
-        run: |
-          docker run --rm \
-            -v /home/runner/work/Azure_Sponsorship_Cost/Azure_Sponsorship_Cost:/app \
-            -w /app \
-            canalyzer:latest \
-            /bin/bash -c "\
-            canalyzer -o report -f markdown \
-            "
-
-  generate-pdf:
-    needs: convert-to-html
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-
-      - name: Load Docker Image from Cache
-        uses: actions/cache@v2
-        with:
-          path: docker-image.tar
-          key: ${{ runner.os }}-docker-image-${{ hashFiles('**/Dockerfile') }}
-      - name: Load Docker Image
-        run: |
-          docker load -i docker-image.tar
-
-      - name: Run Steps in Container
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/app \
-            -w /app \
-            canalyzer:latest \
-            /bin/bash -c "\
-            wkhtmltopdf html_report.html report.pdf \
-            "
-
-  send-email:
-    needs: generate-pdf
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-
-      - name: Load Docker Image from Cache
-        uses: actions/cache@v2
-        with:
-          path: docker-image.tar
-          key: ${{ runner.os }}-docker-image-${{ hashFiles('**/Dockerfile') }}
-      - name: Load Docker Image
-        run: |
-          docker load -i docker-image.tar
-
-      - name: Run Steps in Container
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/app \
-            -w /app \
+            -e CANALYZER_APPSETTINGS_PATH="${{ secrets.CANALYZER_APPSETTINGS_PATH }}" \
             -e SMTP_SERVER="${{ secrets.SMTP_SERVER }}" \
             -e SMTP_PORT="${{ secrets.SMTP_PORT }}" \
             -e SMTP_USERNAME="${{ secrets.SMTP_USERNAME }}" \
@@ -134,5 +29,9 @@ jobs:
             -e EMAIL_TO="${{ secrets.EMAIL_TO }}" \
             canalyzer:latest \
             /bin/bash -c "\
-            canalyzer_smtp html_report_summary.html report.md -a report.pdf \
+              cat \$CANALYZER_APPSETTINGS_PATH > appsettings.json && \
+              canalyzer -o report -f markdown && \
+              markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report.html && \
+              wkhtmltopdf html_report.html report.pdf && \
+              canalyzer_smtp html_report_summary.html report.md -a report.pdf \
             "
