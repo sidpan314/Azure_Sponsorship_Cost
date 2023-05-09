@@ -82,13 +82,13 @@ class Configuration:
         self._logger.debug("Loading settings json file 'appsettings.json'")
         settings_path = os.path.join("appsettings.json")
         if os.path.exists(settings_path) and os.path.isfile(settings_path):
-    #        with open(settings_path, "r") as fp:
-    #            file_content = json.load(fp)
-    #            for k in file_content.keys():
-    #                if k == "smtp":
-    #                    self.smtp.load_from_file(file_content[k])
-    #                elif to_snake_case(k) in dir(self):
-    #                    self.__setattr__(to_snake_case(k), file_content[k])
+            with open(settings_path, "r") as fp:
+                file_content = json.load(fp)
+                for k in file_content.keys():
+                    if k == "smtp":
+                        self.smtp.load_from_file(file_content[k])
+                    elif to_snake_case(k) in dir(self):
+                       self.__setattr__(to_snake_case(k), file_content[k])
         # debug code to print file content
             print("File content:", file_content)
         else:
