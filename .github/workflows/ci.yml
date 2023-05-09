@@ -20,7 +20,7 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}:/app \
             -w /app \
-            -e CANALYZER_APPSETTINGS_PATH="${{ secrets.CANALYZER_APPSETTINGS_PATH }}" \
+            -e CANALYZER_APPSETTINGS_CONTENT="${{ secrets.CANALYZER_APPSETTINGS_CONTENT }}" \
             -e SMTP_SERVER="${{ secrets.SMTP_SERVER }}" \
             -e SMTP_PORT="${{ secrets.SMTP_PORT }}" \
             -e SMTP_USERNAME="${{ secrets.SMTP_USERNAME }}" \
@@ -29,7 +29,7 @@ jobs:
             -e EMAIL_TO="${{ secrets.EMAIL_TO }}" \
             canalyzer:latest \
             /bin/bash -c "\
-              cat \$CANALYZER_APPSETTINGS_PATH > appsettings.json && \
+              echo \"\$CANALYZER_APPSETTINGS_CONTENT\" > appsettings.json && \
               canalyzer -o report -f markdown && \
               markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report.html && \
               wkhtmltopdf html_report.html report.pdf && \
