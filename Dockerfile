@@ -2,16 +2,17 @@ FROM python:3.8-slim AS build
 WORKDIR /src
 COPY requirements.txt .
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends build-essential gcc\
-  && pip install --user -r requirements.txt --no-warn-script-location
+  && apt-get install -y --no-install-recommends build-essential gcc \
+  && python -m venv /venv \
+  && /venv/bin/pip install -r requirements.txt --no-warn-script-location
 
 COPY setup.py .
 COPY canalyzer/ canalyzer/
-RUN pip install --user .
+RUN /venv/bin/pip install .
 
 FROM python:3.8-slim AS runtime
 ENV WKHTMLTOPDF_VERSION=0.12.6-1
-COPY --from=build /root/.local /root/.local
+COPY --from=build /venv /venv
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
   fontconfig libfreetype6 libjpeg62-turbo libpng16-16 \
@@ -26,12 +27,13 @@ RUN apt-get update \
   && dpkg -i wkhtmltopdf.deb \
   && rm -f wkhtmltopdf.deb \
   && apt-get purge -y wget \
-  && pip install markdown
+  && /venv/bin/pip install markdown
 WORKDIR /app
 COPY styles.css /app/styles.css
+COPY appsettings.json /app/appsettings.json
 
-# Make sure scripts in .local are usable:
-ENV PATH=/root/.local/bin:$PATH
+# Make sure scripts in the virtual environment are usable:
+ENV PATH=/venv/bin:$PATH
 LABEL maintainer="José Truyol <jose.truyol@indimin.com>"
 LABEL company="INDIMIN SPA"
 LABEL country="CHILE"
