@@ -42,8 +42,7 @@ jobs:
 
       - name: Run Steps in Container
         run: |
-          echo "Secret content:"
-          echo 'ewogICJhcHBJZCI6ICJkNjAzOWJiYy00ZDQ1LTQ4YmUtYThmYy02MDQ3MGRmOWEyYzIiLAogICJkaXNwbGF5TmFtZSI6ICJDb25zdW1wdGlvbkFQSSIsCiAgInBhc3N3b3JkIjogImYyTzhRfmMxdVhGckFSNHpWZXphVUdTTm95M1BqNzVscmVnTmVjM3YiLAogICJ0ZW5hbnQiOiAiZjhhMGRhYjQtNjRmNi00YzgxLTlkYjQtNDdhOWY2MzkwMzlhIgp9Cg==' | base64 --decode > appsettings.json
+          echo '${{ secrets.APPSETTINGS_JSON }}' | base64 --decode > appsettings.json
           docker run --rm \
             -v /home/runner/work/Azure_Sponsorship_Cost/Azure_Sponsorship_Cost:/app \
             -w /app \
@@ -51,8 +50,7 @@ jobs:
             canalyzer:latest \
             /bin/bash -c "\
             ls -al /app && \
-            echo '${{ secrets.APPSETTINGS_JSON }}' > \$CANALYZER_APPSETTINGS_PATH \
-            && echo 'Content of appsettings.json:' \
+            echo 'Content of appsettings.json:' \
             && cat \$CANALYZER_APPSETTINGS_PATH \
             && canalyzer -o report -f markdown \
             "
