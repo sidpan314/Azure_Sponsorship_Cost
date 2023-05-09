@@ -1,9 +1,10 @@
 FROM python:3.8-slim AS build
 WORKDIR /src
 COPY requirements.txt .
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends build-essential gcc\
-  && pip install --user -r requirements.txt --no-warn-script-location
+RUN apt-get update && \
+    apt-get install -y jq && \
+    apt-get install -y --no-install-recommends build-essential gcc && \
+    pip install --user -r requirements.txt --no-warn-script-location
 
 COPY setup.py .
 COPY canalyzer/ canalyzer/
