@@ -53,6 +53,7 @@ jobs:
             canalyzer:latest \
             /bin/bash -c "\
             echo '{\"clientId\": \"'${CLIENT_ID}'\", \"clientSecret\": \"'${CLIENT_SECRET}'\", \"subscriptionId\": \"'${SUBSCRIPTION_ID}'\", \"tenantId\": \"'${TENANT_ID}'\"}' > temp.json && \
+            apt-get update && apt-get install -y jq && \
             jq -s '.[0] * .[1]' appsettings.json temp.json > temp2.json && \
             mv temp2.json appsettings.json && \
             canalyzer -o report -f markdown && \
@@ -60,4 +61,3 @@ jobs:
             wkhtmltopdf html_report.html report.pdf && \
             canalyzer_smtp html_report_summary.html report.md -a report.pdf \
             "
-
