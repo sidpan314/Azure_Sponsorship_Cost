@@ -20,6 +20,7 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}:/app \
             -w /app \
+            -e CANALYZER_LOG_LEVEL="DEBUG" \
             -e CANALYZER_APPSETTINGS_CONTENT="${{ secrets.CANALYZER_APPSETTINGS_CONTENT }}" \
             -e SMTP_SERVER="${{ secrets.SMTP_SERVER }}" \
             -e SMTP_PORT="${{ secrets.SMTP_PORT }}" \
