@@ -34,6 +34,6 @@ jobs:
             /bin/bash -c "\
               canalyzer -o report -f markdown && \
               markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report.html && \
-              wkhtmltopdf file://app/html_report.html report.pdf && \
+              wkhtmltopdf file://html_report.html report.pdf && \
               canalyzer_smtp html_report_summary.html report.md -a report.pdf \
             "
