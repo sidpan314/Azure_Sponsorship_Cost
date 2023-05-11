@@ -11,9 +11,6 @@ COPY setup.py .
 COPY canalyzer/ canalyzer/
 RUN /venv/bin/pip install .
 
-# Install pandoc
-RUN apt-get install -y pandoc
-
 FROM python:3.8-slim AS runtime
 ENV WKHTMLTOPDF_VERSION=0.12.6-1
 COPY --from=build /venv /venv
