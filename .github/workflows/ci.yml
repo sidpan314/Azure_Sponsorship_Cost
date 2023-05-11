@@ -32,7 +32,7 @@ jobs:
             -e CANALYYZER_SUBSCRIPTION_ID="${{ secrets.CANALYYZER_SUBSCRIPTION_ID }}" \
             canalyzer:latest \
             /bin/bash -c "\
-              canalyzer -o report -f markdown && \
+              canalyzer --reset -o report -f markdown && \
               markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report.html && \
               canalyzer_smtp html_report_summary.html report.md html_report.html \
             "
