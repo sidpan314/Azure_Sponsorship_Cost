@@ -38,7 +38,7 @@ class HtmlEmail:
 
         for attachment in attachments:
             if not os.path.isfile(attachment):
-                self._logger(f"File not found: {attachment}")
+                self._logger.error(f"File not found: {attachment}")
             filename = os.path.basename(attachment)
             main_type, sub_type = self.__get_mime_type(attachment)
             with open(attachment, "rb") as fp:
