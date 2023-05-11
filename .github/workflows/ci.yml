@@ -34,10 +34,5 @@ jobs:
             /bin/bash -c "\
               canalyzer -o report -f markdown && \
               markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report.html && \
-              echo 'Checking if html_report.html is created:' && \
-              ls -al /app && \
-              echo 'Checking permissions of html_report.html:' && \
-              ls -l /app/html_report.html && \
-              pandoc html_report.html -o report.pdf && \
-              canalyzer_smtp html_report_summary.html report.md -a report.pdf \
+              canalyzer_smtp html_report_summary.html report.md html_report.html \
             "
