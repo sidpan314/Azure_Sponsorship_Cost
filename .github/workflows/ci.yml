@@ -20,7 +20,7 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}:/app \
             -w /app \
-            -e CANALYZER_APPSETTINGS_PATH="${{ secrets.CANALYZER_APPSETTINGS_PATH }}" \
+            -e CANALYZER_APPSETTINGS_PATH="/app/appsettings.json" \
             -e SMTP_SERVER="${{ secrets.SMTP_SERVER }}" \
             -e SMTP_PORT="${{ secrets.SMTP_PORT }}" \
             -e SMTP_USERNAME="${{ secrets.SMTP_USERNAME }}" \
