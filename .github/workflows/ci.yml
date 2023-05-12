@@ -33,7 +33,7 @@ jobs:
             canalyzer:latest \
             /bin/bash -c "\
               canalyzer -o report -f markdown && \
-              markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report.html && \
+              markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report && \
               ls -la && \
-              canalyzer_smtp report.md html_report.html \
+              canalyzer_smtp report.md html_report \
             "
