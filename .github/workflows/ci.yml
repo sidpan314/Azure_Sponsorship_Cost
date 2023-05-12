@@ -36,5 +36,5 @@ jobs:
               markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report && \
               ls -la && \
               wkhtmltopdf html_report.html report.pdf
-              canalyzer_smtp report.pdf html_report_summary.html \
+              canalyzer_smtp html_report_summary.html report.pdf \
             "
