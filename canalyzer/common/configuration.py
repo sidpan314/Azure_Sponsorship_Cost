@@ -16,10 +16,11 @@ class SmtpConfiguration:
         self.user = None
         self.password = None
 
-    def load_from_file(self, json_content: dict):
-        for k in json_content.keys():
-            if to_snake_case(k) in dir(self):
-                self.__setattr__(to_snake_case(k), json_content[k])
+    # Commented out as we won't be loading SMTP configuration from file anymore
+    # def load_from_file(self, json_content: dict):
+    #     for k in json_content.keys():
+    #         if to_snake_case(k) in dir(self):
+    #             self.__setattr__(to_snake_case(k), json_content[k])
 
     def load_from_env(self):
         self.subject = os.environ.get("CANALYYZER_SMTP_SUBJECT", self.subject)
@@ -51,7 +52,8 @@ class Configuration:
 
     def load(self):
         self._logger.info("Loading configuration")
-        self.__from_file()
+        # Commented out as we won't be loading configuration from file anymore
+        # self.__from_file()
         self.__from_env()
         self._logger.debug(self)
 
@@ -78,21 +80,22 @@ class Configuration:
         )
         self.smtp.load_from_env()
 
-    def __from_file(self):
-        self._logger.debug("Loading settings json file 'appsettings.json'")
-        settings_path = os.path.join("appsettings.json")
-        if os.path.exists(settings_path) and os.path.isfile(settings_path):
-            with open(settings_path, "r") as fp:
-                file_content = json.load(fp)
-                for k in file_content.keys():
-                    if k == "smtp":
-                        self.smtp.load_from_file(file_content[k])
-                    elif to_snake_case(k) in dir(self):
-                       self.__setattr__(to_snake_case(k), file_content[k])
-        # debug code to print file content
-            print("File content:", file_content)
-        else:
-            self._logger.debug("Settings file 'appsettings.json' not found")
+        # Commented out as we won't be loading configuration from file anymore
+    # def __from_file(self):
+    #     self._logger.debug("Loading settings json file 'appsettings.json'")
+    #     settings_path = os.path.join("appsettings.json")
+    #     if os.path.exists(settings_path) and os.path.isfile(settings_path):
+    #         with open(settings_path, "r") as fp:
+    #             file_content = json.load(fp)
+    #             for k in file_content.keys():
+    #                 if k == "smtp":
+    #                     self.smtp.load_from_file(file_content[k])
+    #                 elif to_snake_case(k) in dir(self):
+    #                    self.__setattr__(to_snake_case(k), file_content[k])
+    #     # debug code to print file content
+    #         print("File content:", file_content)
+    #     else:
+    #         self._logger.debug("Settings file 'appsettings.json' not found")
 
 
     def __repr__(self) -> str:
