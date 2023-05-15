@@ -15,7 +15,7 @@ jobs:
       - name: Build Docker Image
         run: docker build -t canalyzer:latest .
 
-      - name: Run Steps in Container
+      - name: Echo Start
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/app \
@@ -32,13 +32,49 @@ jobs:
             -e CANALYYZER_SUBSCRIPTION_ID="${{ secrets.CANALYYZER_SUBSCRIPTION_ID }}" \
             canalyzer:latest \
             /bin/bash -c "\
+              echo "Starting Docker container"
+
+      - name: Run canalyzer
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            canalyzer:latest \
+            /bin/bash -c "\
+              set -e && \
               echo "Running canalyzer" && \
-              canalyzer -o report -f markdown && \
+              canalyzer -o report -f markdown"
+
+      - name: Convert markdown to HTML
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            canalyzer:latest \
+            /bin/bash -c "\
+              set -e && \
               echo "Converting markdown to HTML" && \
-              markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report && \
+              markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report"
+
+      - name: Convert HTML to PDF
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            canalyzer:latest \
+            /bin/bash -c "\
+              set -e && \
               echo "Converting HTML to PDF" && \
               cat html_report.html && \
-              wkhtmltopdf html_report.html report.pdf && \
+              wkhtmltopdf html_report.html report.pdf"
+
+      - name: Final steps
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            canalyzer:latest \
+            /bin/bash -c "\
+              set -e && \
               ls -la && \
-              canalyzer_smtp html_report_summary.html report.pdf \
-            "
+              canalyzer_smtp html_report_summary.html report.pdf"
