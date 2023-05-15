@@ -32,7 +32,7 @@ jobs:
             -e CANALYYZER_SUBSCRIPTION_ID="${{ secrets.CANALYYZER_SUBSCRIPTION_ID }}" \
             canalyzer:latest \
             /bin/bash -c "\
-              echo "Starting Docker container"
+              echo \"Starting Docker container\""
 
       - name: Run canalyzer
         run: |
