@@ -48,7 +48,7 @@ jobs:
             /bin/bash -c "\
               set -e && \
               echo 'Running canalyzer' && \
-              canalyzer -o report -f markdown" \
+              canalyzer -o report -f markdown && \
               ls -la"
 
       - name: Convert markdown to HTML
