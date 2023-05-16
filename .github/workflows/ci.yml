@@ -47,7 +47,7 @@ jobs:
             canalyzer:latest \
             /bin/bash -c "\
               set -e && \
-              echo "Running canalyzer" && \
+              echo 'Running canalyzer' && \
               canalyzer -o report -f markdown"
               ls -la"
 
