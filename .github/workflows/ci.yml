@@ -17,6 +17,7 @@ jobs:
 
       - name: Echo Start
         run: |
+         echo "Step 'Echo Start' executed"
           docker run --rm \
             -v ${{ github.workspace }}:/app \
             -w /app \
@@ -36,6 +37,7 @@ jobs:
 
       - name: Run canalyzer
         run: |
+          echo "Step 'Run canalyzer' executed"
           docker run --rm \
             -v ${{ github.workspace }}:/app \
             -w /app \
@@ -58,6 +60,7 @@ jobs:
 
       - name: Convert HTML to PDF
         run: |
+          echo "Step 'Convert markdown to HTML' executed"
           docker run --rm \
             -v ${{ github.workspace }}:/app \
             -w /app \
@@ -68,8 +71,9 @@ jobs:
               cat html_report.html && \
               wkhtmltopdf html_report.html report.pdf"
 
-      - name: Final steps
+      - name: SMTP
         run: |
+          echo "Step 'SMTP' executed"
           docker run --rm \
             -v ${{ github.workspace }}:/app \
             -w /app \
