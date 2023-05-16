@@ -48,6 +48,9 @@ jobs:
             /bin/bash -c "\
               set -e && \
               echo 'Running canalyzer' && \
+              echo 'CANALYYZER_CLIENT_ID: ' \$CANALYYZER_CLIENT_ID && \
+              echo 'CANALYYZER_TENANT_ID: ' \$CANALYYZER_TENANT_ID && \
+              echo 'CANALYYZER_SUBSCRIPTION_ID: ' \$CANALYYZER_SUBSCRIPTION_ID && \
               canalyzer -o report -f markdown && \
               ls -la"
 
