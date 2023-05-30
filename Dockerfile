@@ -24,6 +24,7 @@ RUN apt-get update \
   xfonts-75dpi \
   xfonts-base \
   wget \
+  curl \
   && wget -O wkhtmltopdf.deb https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}.buster_amd64.deb \
   && dpkg -i wkhtmltopdf.deb \
   && rm -f wkhtmltopdf.deb \
@@ -37,4 +38,4 @@ COPY appsettings.json /app/appsettings.json
 ENV PATH=/venv/bin:$PATH
 LABEL maintainer="José Truyol <jose.truyol@indimin.com>"
 LABEL company="INDIMIN SPA"
-LABEL country="CHILE"
+LABEL country="CANADA"
