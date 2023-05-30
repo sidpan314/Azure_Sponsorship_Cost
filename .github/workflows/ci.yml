@@ -76,6 +76,20 @@ jobs:
               markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report && \
               ls -la"
 
+      - name: Check HTML Report
+        run: |
+          echo "Step 'Check HTML Report' executed"
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            canalyzer:latest \
+            /bin/bash -c "\
+              set -e && \
+              echo \"HTML Report Size\" && \
+              wc -c html_report.html && \
+              echo \"HTML Report Content\" && \
+              cat html_report.html"
+      
       - name: Convert HTML to PDF
         run: |
           echo "Step 'Convert markdown to HTML' executed"
