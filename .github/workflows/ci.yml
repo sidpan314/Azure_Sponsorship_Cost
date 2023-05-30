@@ -100,5 +100,5 @@ jobs:
             /bin/bash -c "\
               set -e && \
               ls -la && \
-              canalyzer_smtp html_report_summary.html report.pdf \
+              canalyzer_smtp html_report_summary.html \
             "
