@@ -44,6 +44,16 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}:/app \
             -w /app \
+            -e CANALYYZER_SMTP_HOST="${{ secrets.CANALYYZER_SMTP_HOST }}" \
+            -e CANALYYZER_SMTP_PORT="${{ secrets.CANALYYZER_SMTP_PORT }}" \
+            -e CANALYYZER_SMTP_USER="${{ secrets.CANALYYZER_SMTP_USER }}" \
+            -e CANALYYZER_SMTP_PASSWORD="${{ secrets.CANALYYZER_SMTP_PASSWORD }}" \
+            -e CANALYYZER_SMTP_FROM="${{ secrets.CANALYYZER_SMTP_FROM }}" \
+            -e CANALYYZER_SMTP_TO="${{ secrets.CANALYYZER_SMTP_TO }}" \
+            -e CANALYYZER_TENANT_ID="${{ secrets.CANALYYZER_TENANT_ID }}" \
+            -e CANALYYZER_CLIENT_ID="${{ secrets.CANALYYZER_CLIENT_ID }}" \
+            -e CANALYYZER_CLIENT_SECRET="${{ secrets.CANALYYZER_CLIENT_SECRET }}" \
+            -e CANALYYZER_SUBSCRIPTION_ID="${{ secrets.CANALYYZER_SUBSCRIPTION_ID }}" \
             canalyzer:latest \
             /bin/bash -c "\
               set -e && \
