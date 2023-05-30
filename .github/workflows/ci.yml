@@ -73,7 +73,7 @@ jobs:
             /bin/bash -c "\
               set -e && \
               echo 'Converting markdown to HTML' && \
-              markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report" \
+              markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report" && \
               ls -la"
 
       - name: Convert HTML to PDF
