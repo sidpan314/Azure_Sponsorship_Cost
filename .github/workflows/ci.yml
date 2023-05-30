@@ -90,15 +90,15 @@ jobs:
               echo \"HTML Report Content\" && \
               cat html_report.html"      
       
-      - name: SMTP
+          
+      - name: Send to Teams
         run: |
-          echo "Step 'SMTP' executed"
+          echo "Step 'Send to Teams' executed"
           docker run --rm \
             -v ${{ github.workspace }}:/app \
             -w /app \
             canalyzer:latest \
             /bin/bash -c "\
               set -e && \
-              ls -la && \
-              canalyzer_smtp html_report_summary.html \
-            "
+              echo 'Sending report to Teams' && \
+              curl -H \"Content-Type: application/json\" -d @html_report.html ${{ secrets.TEAM_HOOK }}"
