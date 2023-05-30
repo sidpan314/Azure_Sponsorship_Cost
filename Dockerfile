@@ -10,6 +10,7 @@ RUN apt-get update \
 COPY setup.py .
 COPY canalyzer/ canalyzer/
 RUN /venv/bin/pip install .
+RUN /venv/bin/pip install html-to-text
 
 FROM python:3.8-slim AS runtime
 ENV WKHTMLTOPDF_VERSION=0.12.6-1
