@@ -87,7 +87,7 @@ jobs:
               set -e && \
               echo "Converting HTML to PDF" && \
               cat html_report.html && \
-              wkhtmltopdf --debug-javascript --no-stop-slow-scripts html_report.html report.pdf || echo \"Exit code: $?\" && \
+              pandoc -s html_report.html -o report.pdf || echo \"Exit code: $?\" && \
               ls -la"
 
       - name: SMTP
