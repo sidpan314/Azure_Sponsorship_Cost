@@ -64,31 +64,17 @@ jobs:
               canalyzer -o report -f markdown && \
               ls -la"
 
-      - name: Convert markdown to HTML
+      - name: Convert HTML to Text
         run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/app \
-            -w /app \
-            canalyzer:latest \
-            /bin/bash -c "\
-              set -e && \
-              echo \"Converting markdown to HTML\" && \
-              markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report && \
-              ls -la"
-
-      - name: Check HTML Report
-        run: |
-          echo "Step 'Check HTML Report' executed"
-          docker run --rm \
-            -v ${{ github.workspace }}:/app \
-            -w /app \
-            canalyzer:latest \
-            /bin/bash -c "\
-              set -e && \
-              echo \"HTML Report Size\" && \
-              wc -c html_report.html && \
-              echo \"HTML Report Content\" && \
-              cat html_report.html"      
+         echo "Step 'Convert HTML to Text' executed"
+         docker run --rm \
+         -v ${{ github.workspace }}:/app \
+         -w /app \
+         canalyzer:latest \
+         /bin/bash -c "\
+         set -e && \
+         echo 'Converting HTML to Text' && \
+         html-to-text < html_report.html > report.txt"
       
           
       - name: Send to Teams
@@ -101,4 +87,4 @@ jobs:
             /bin/bash -c "\
               set -e && \
               echo 'Sending report to Teams' && \
-              curl -H \"Content-Type: application/json\" -d @html_report.html ${{ secrets.TEAM_HOOK }}"
+              curl -H \"Content-Type: application/json\" -d @report.txt ${{ secrets.TEAM_HOOK }}"
