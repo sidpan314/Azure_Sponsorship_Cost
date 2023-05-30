@@ -88,22 +88,8 @@ jobs:
               echo \"HTML Report Size\" && \
               wc -c html_report.html && \
               echo \"HTML Report Content\" && \
-              cat html_report.html"
+              cat html_report.html"      
       
-      - name: Convert HTML to PDF
-        run: |
-          echo "Step 'Convert markdown to HTML' executed"
-          docker run --rm \
-            -v ${{ github.workspace }}:/app \
-            -w /app \
-            canalyzer:latest \
-            /bin/bash -c "\
-              set -e && \
-              echo "Converting HTML to PDF" && \
-              cat html_report.html && \
-              pandoc -s html_report.html -o report.pdf || echo \"Exit code: $?\" && \
-              ls -la"
-
       - name: SMTP
         run: |
           echo "Step 'SMTP' executed"
