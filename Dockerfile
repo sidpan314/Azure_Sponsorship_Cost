@@ -12,6 +12,10 @@ COPY canalyzer/ canalyzer/
 RUN /venv/bin/pip install .
 RUN /venv/bin/pip install html-to-text
 
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates curl gnupg lsb-release \
+  && curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+
 FROM python:3.8-slim AS runtime
 ENV WKHTMLTOPDF_VERSION=0.12.6-1
 COPY --from=build /venv /venv
