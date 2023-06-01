@@ -76,9 +76,9 @@ jobs:
               markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report && \
               ls -la"
               
-      - name: Convert HTML to Text
+      - name: Convert HTML to PDF
         run: |
-         echo "Step 'Convert HTML to Text' executed"
+         echo "Step 'Convert HTML to PDF' executed"
          docker run --rm \
          -v ${{ github.workspace }}:/app \
          -w /app \
@@ -86,8 +86,8 @@ jobs:
          /bin/bash -c "\
          set -e && \
          ls -la && \
-         echo 'Converting HTML to Text' && \
-         html2text html_report.html > report.txt"
+         echo 'Converting HTML to PDF' && \
+         wkhtmltopdf html_report.html report.pdf
       
           
       - name: Run Python Script to Upload to Azure Blob Storage
