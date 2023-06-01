@@ -73,6 +73,7 @@ jobs:
          canalyzer:latest \
          /bin/bash -c "\
          set -e && \
+         ls -la && \
          echo 'Converting HTML to Text' && \
          html2text html_report.html > report.txt"
       
