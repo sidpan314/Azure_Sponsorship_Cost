@@ -2,8 +2,8 @@ FROM python:3.8-slim AS build
 WORKDIR /src
 COPY requirements.txt .
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends build-essential gcc html2text \
-  && apt-get install -y apt-utils \
+  && apt-get install -y --no-install-recommends build-essential gcc \
+  && apt-get install -y apt-utils html2text \
   && python -m venv /venv \
   && /venv/bin/pip install -r requirements.txt --no-warn-script-location
 
