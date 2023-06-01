@@ -90,27 +90,35 @@ jobs:
          html2text html_report.html > report.txt"
       
           
+      - name: Upload to Azure Storage
+        run: |
+          az storage blob upload \
+            --account-name <storage_account_name> \
+            --account-key <storage_account_key> \
+            --container-name <container_name> \
+            --name report.txt \
+            --type block \
+            --type content-type text/plain \
+            --type content-encoding gzip \
+            --type content-disposition attachment \
+            --type cache-control no-cache \
+            --type content-language en \
+            --type content-md5 "$(md5sum report.txt | awk '{ print $1 }')" \
+            --type content-length "$(wc -c < report.txt)" \
+            --type content $(< report.txt)
+
+      - name: Get Azure Storage Blob URL
+        id: get_blob_url
+        run: |
+          blob_url=$(az storage blob url \
+            --account-name azurecostupload \
+            --account-key Ewt7Di+jORzfbJKPC0uxYYrM+c5PaD/trtZJLKpl+SUooffHbwmhgjQnH+V6e8/d5ZjMH9GsiS5C+AStN4fvBA== \
+            --container-name azurecostanalysis \
+            --name report.txt \
+            --output tsv)
+          echo "::set-output name=blob_url::$blob_url"
+
       - name: Send to Teams
         run: |
-         echo "Step 'Send to Teams' executed"
-         docker run --rm \
-         -v ${{ github.workspace }}:/app \
-         -w /app \
-         canalyzer:latest \
-         /bin/bash -c "\
-         set -e && \
-         ls -la && \
-         echo 'Sending report to Teams' && \
-         split -l 1000 report.txt report_part_ && \
-         for f in report_part_*; do \
-            report_content=\$(cat $f) && \
-          if [[ -n \"\$report_content\" && \"\$report_content\" =~ [^[:space:]] ]]; then \
-            json_payload=\$(jq -n --arg msg \"\$report_content\" '{
-            \"@type\": \"MessageCard\",
-            \"@context\": \"http://schema.org/extensions\",
-            \"text\": \$msg
-            }') && \
-            curl -H \"Content-Type: application/json\" -d \"\$json_payload\" ${{ secrets.TEAM_HOOK }}; \
-          fi; \
-          sleep 1; \
-         done"
+          blob_url="${{ steps.get_blob_url.outputs.blob_url }}"
+          curl -H "Content-Type: application/json" -d "{\"text\": \"Report file: [Link]($blob_url)\"}" ${{ secrets.TEAM_HOOK }}
