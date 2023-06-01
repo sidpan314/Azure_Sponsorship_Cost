@@ -99,5 +99,6 @@ jobs:
             canalyzer:latest \
             /bin/bash -c "\
               set -e && \
+              ls -la && \
               echo 'Sending report to Teams' && \
               curl -H \"Content-Type: application/json\" -d @report.txt ${{ secrets.TEAM_HOOK }}"
