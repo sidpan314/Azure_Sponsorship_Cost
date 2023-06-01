@@ -114,4 +114,4 @@ jobs:
           fi; \
           sleep 1; \
          done"
-         shell: bash
+         shell: /usr/bin/bash -e {0}
