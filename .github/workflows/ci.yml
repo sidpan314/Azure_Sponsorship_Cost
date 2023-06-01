@@ -64,6 +64,18 @@ jobs:
               canalyzer -o report -f markdown && \
               ls -la"
 
+      - name: Convert markdown to HTML
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            -w /app \
+            canalyzer:latest \
+            /bin/bash -c "\
+              set -e && \
+              echo \"Converting markdown to HTML\" && \
+              markdown_to_html report.md --css styles.css --with-summary --premailer -o html_report && \
+              ls -la"
+              
       - name: Convert HTML to Text
         run: |
          echo "Step 'Convert HTML to Text' executed"
