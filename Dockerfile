@@ -27,6 +27,7 @@ RUN apt-get update \
   wget \
   curl \
   html2text \
+  jq \
   && wget -O wkhtmltopdf.deb https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}.buster_amd64.deb \
   && dpkg -i wkhtmltopdf.deb \
   && rm -f wkhtmltopdf.deb \
