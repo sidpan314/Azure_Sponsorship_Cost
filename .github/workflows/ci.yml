@@ -104,12 +104,14 @@ jobs:
          split -l 1000 report.txt report_part_ && \
          for f in report_part_*; do \
             report_content=\$(cat $f) && \
+          if [[ -n \"\$report_content\" && \"\$report_content\" =~ [^[:space:]] ]]; then \
             json_payload=\$(jq -n --arg msg \"\$report_content\" '{
             \"@type\": \"MessageCard\",
             \"@context\": \"http://schema.org/extensions\",
             \"text\": \$msg
             }') && \
             curl -H \"Content-Type: application/json\" -d \"\$json_payload\" ${{ secrets.TEAM_HOOK }}; \
-            sleep 1; \
+          fi; \
+          sleep 1; \
          done"
-         shell: /usr/bin/bash -e {0}
+         shell: bash
