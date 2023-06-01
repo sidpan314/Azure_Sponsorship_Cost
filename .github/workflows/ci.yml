@@ -74,7 +74,7 @@ jobs:
          /bin/bash -c "\
          set -e && \
          echo 'Converting HTML to Text' && \
-         html-to-text < html_report.html > report.txt"
+         html2text html_report.html > report.txt"
       
           
       - name: Send to Teams
