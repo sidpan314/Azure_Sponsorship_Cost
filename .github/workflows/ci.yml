@@ -99,26 +99,8 @@ jobs:
             -e STORAGE_ACCOUNT_NAME="${{ secrets.STORAGE_ACCOUNT_NAME }}" \
             -e CONNECTION_STRING="${{ secrets.CONNECTION_STRING }}" \
             -e CONTAINER_NAME="${{ secrets.CONTAINER_NAME }}" \
-            -e FILE_PATH="/app/report.txt" \
-            -e FILE_NAME="report.txt" \
             canalyzer:latest \
             /bin/bash -c "\
               set -e && \
               echo 'Running Python script' && \
-              python /path-to-your-script/upload.py"
-
-      - name: Get Azure Storage Blob URL
-        id: get_blob_url
-        run: |
-          blob_url=$(az storage blob url \
-            --account-name ${{ secrets.STORAGE_ACCOUNT_NAME }} \
-            --account-key ${{ secrets.STORAGE_ACCOUNT_KEY }} \
-            --container-name ${{ secrets.CONTAINER_NAME }} \
-            --name report.txt \
-            --output tsv)
-          echo "::set-output name=blob_url::$blob_url"
-
-      - name: Send to Teams
-        run: |
-          blob_url="${{ steps.get_blob_url.outputs.blob_url }}"
-          curl -H "Content-Type: application/json" -d "{\"text\": \"Report file: [Link]($blob_url)\"}" ${{ secrets.TEAM_HOOK }}
+              python ./upload.py"
