@@ -26,6 +26,7 @@ RUN apt-get update \
   xfonts-base \
   wget \
   curl \
+  html2text \
   && wget -O wkhtmltopdf.deb https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}.buster_amd64.deb \
   && dpkg -i wkhtmltopdf.deb \
   && rm -f wkhtmltopdf.deb \
