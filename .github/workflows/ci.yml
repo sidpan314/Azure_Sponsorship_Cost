@@ -102,5 +102,6 @@ jobs:
             canalyzer:latest \
             /bin/bash -c "\
               set -e && \
+              ls -la && \
               echo 'Running Python script' && \
               python ./upload.py"
