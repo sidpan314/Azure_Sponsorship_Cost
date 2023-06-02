@@ -93,7 +93,7 @@ jobs:
       - name: Run Python Script to Upload to Azure Blob Storage
         run: |
           docker run --rm \
-            -v /home/runner/work/Azure_Sponsorship_Cost/Azure_Sponsorship_Cost:/app \
+            -v ${{ github.workspace }}:/app \
             -w /app \
             -e STORAGE_ACCOUNT_KEY="${{ secrets.STORAGE_ACCOUNT_KEY }}" \
             -e STORAGE_ACCOUNT_NAME="${{ secrets.STORAGE_ACCOUNT_NAME }}" \
@@ -107,9 +107,9 @@ jobs:
               python ./upload.py"
               
               
-              - name: Get Azure Storage Blob URL
-          id: get_blob_url
-          run: |
+      - name: Get Azure Storage Blob URL
+        id: get_blob_url
+        run: |
             blob_url=$(az storage blob url \
             --account-name ${{ secrets.STORAGE_ACCOUNT_NAME }} \
             --account-key ${{ secrets.STORAGE_ACCOUNT_KEY }} \
@@ -117,8 +117,6 @@ jobs:
             --name report.pdf \
             --output tsv)
             echo "::set-output name=blob_url::$blob_url"
-
-
 
       - name: Send to Teams
         run: |
