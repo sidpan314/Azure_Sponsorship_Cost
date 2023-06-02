@@ -87,7 +87,7 @@ jobs:
          set -e && \
          ls -la && \
          echo 'Converting HTML to PDF' && \
-         wkhtmltopdf html_report.html report.pdf
+         wkhtmltopdf html_report.html report.pdf"
       
           
       - name: Run Python Script to Upload to Azure Blob Storage
