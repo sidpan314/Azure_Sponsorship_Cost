@@ -93,7 +93,7 @@ jobs:
       - name: Run Python Script to Upload to Azure Blob Storage
         run: |
           docker run --rm \
-            -v ${{ github.workspace }}:/app \
+            -v /home/runner/work/Azure_Sponsorship_Cost/Azure_Sponsorship_Cost:/app \
             -w /app \
             -e STORAGE_ACCOUNT_KEY="${{ secrets.STORAGE_ACCOUNT_KEY }}" \
             -e STORAGE_ACCOUNT_NAME="${{ secrets.STORAGE_ACCOUNT_NAME }}" \
