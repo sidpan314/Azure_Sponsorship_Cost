@@ -13,7 +13,7 @@ def uploadToBlobStorage():
     blob_client = blob_service_client.get_blob_client(container_name, file_name)
 
     with open(file_path, "rb") as data:
-        blob_client.upload_blob(data)
+        blob_client.upload_blob(data, overwrite=True)
 
 if __name__ == "__main__":
     uploadToBlobStorage()
