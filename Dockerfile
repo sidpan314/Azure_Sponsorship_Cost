@@ -6,6 +6,7 @@ RUN apt-get update \
   && apt-get install -y apt-utils html2text \
   && python -m venv /venv \
   && /venv/bin/pip install -r requirements.txt --no-warn-script-location
+  && /venv/bin/pip install azure-storage-blob
 
 COPY setup.py .
 COPY canalyzer/ canalyzer/
